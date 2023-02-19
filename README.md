@@ -1,9 +1,9 @@
 # HtN_BE_Challenge_Submission
-###Language / Tools:
+### Language / Tools:
 Using Python since I have used python libraries with json and REST in the past, also memory efficiency and class structure are not neccesities, no technical limitation encouraging use of C/C++
 Will try SQLite for database since it was recommended and easy to install
 
-###Database schema:
+### Database schema:
 Three Tables:
 
 	a) name, contact information etc.
