@@ -6,22 +6,24 @@ Will try SQLite for database since it was recommended and easy to install
 ### Database schema:
 Three Tables:
 
-	a) name, contact information etc.
+Table A (name, contact information etc.)
 
 User_id	(primary key) | Name | Company | email | phone |
 
--Primary Key: Userid = dictionary index / place in original json -> incase people have the same name / company, email and phone may change / be updated
+- Primary Key: Userid = dictionary index / place in original json -> incase people have the same name / company, email and phone may change / be updated
 
-	b) Skill Ratings
+Table B (Skill Ratings)
 
 Skill_id (primary_key) | User_id | Skill_Name | Rating |
 
--Different total number of skills than everything else, will need a different primary id to track -> new table
--Link to table A with User_id for user info queries
+- Different total number of skills than everything else, will need a different primary id to track -> new table
+- Link to table A with User_id for user info queries
 
-c) Skills data
+Table C (Skills data)
 Skill_Name (Primary_id)	| Frequency
 
--Make a separate table to keep track of skill frequencies
--Calculate skill frequency field with a query like this: https://stackoverflow.com/questions/12344795/count-the-number-of-occurrences-of-a-string-in-a-varchar-field
--Frequency will be calculated from table B, but no need to link them with a common field
+- Make a separate table to keep track of skill frequencies
+- Frequency will be calculated as we insert the JSON file, and updated as necessary
+
+#### Table C Discussion:
+Frequency could also be calculated without the use of Table C using a query like the one mentionned here: https://stackoverflow.com/questions/12344795/count-the-number-of-occurrences-of-a-string-in-a-varchar-field with Table B. However, since we know that the participants' skills are unlikely to change over time, and the majority of the participants' data is available initially, its more efficient to calculate frequency at the start with Python and update Table C as skills are modified rather than run a complicated and time consuming SQL query every time we need to access the frequency.
