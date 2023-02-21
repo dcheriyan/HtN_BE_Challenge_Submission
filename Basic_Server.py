@@ -43,6 +43,38 @@ def All_Users_query():
     output_json = json.dumps(personal_info_formatted)
     return output_json
 
+def Specific_User_query(Input_User):
+    conn = sqlite3.connect("HTN_BE_Challenge.db")
+    #TODO make sure connection was sucessful
+    curs = conn.cursor()
+
+    Query_string = "SELECT * FROM Personal_Info WHERE user_id = '" + str(Input_User) + "'"
+
+    res = curs.execute(Query_string)
+    personal_info_values = res.fetchone()
+    personal_info_formatted = []
+    temp_dict = {}
+    temp_dict["user_id"] = personal_info_values[0]
+    temp_dict["name"] = personal_info_values[1]
+    temp_dict["company"] = personal_info_values[2]
+    temp_dict["email"] = personal_info_values[3]
+    temp_dict["phone"] = personal_info_values[4]
+    personal_info_formatted.append(temp_dict.copy())
+
+    Query_string = "SELECT * FROM User_Skills WHERE user_id = '" + str(Input_User) + "'"
+    res = curs.execute(Query_string)
+    skill_values = res.fetchall()
+    temp_dict = {}
+    temp_list = []
+    for skill_index in skill_values:
+        temp_dict["skill"] = skill_index[2]
+        temp_dict["rating"] = skill_index[3]
+        temp_list.append(temp_dict.copy())
+
+    personal_info_formatted[0]["skills"] = temp_list.copy()
+
+    output_json = json.dumps(personal_info_formatted)
+    return output_json
 
 @app.route('/')
 def Placeholder():
@@ -50,5 +82,10 @@ def Placeholder():
 
 @app.get('/users')
 def All_Users():
-    All_users = All_Users_query()
-    return All_users
+    All_users_output = All_Users_query()
+    return All_users_output
+
+@app.get('/users/<int:user_id>')
+def Get_Specific_User(user_id):
+    Specific_user_output = Specific_User_query(user_id)
+    return Specific_user_output
