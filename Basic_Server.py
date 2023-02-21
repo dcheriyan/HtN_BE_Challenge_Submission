@@ -1,6 +1,6 @@
 import sqlite3
 import json
-from flask import Flask
+from flask import Flask, request
 
 app = Flask(__name__)
 
@@ -76,6 +76,29 @@ def Specific_User_query(Input_User):
     output_json = json.dumps(personal_info_formatted)
     return output_json
 
+def Update_User_query(Input_User, Input_Dict):
+    conn = sqlite3.connect("HTN_BE_Challenge.db")
+    #TODO make sure connection was sucessful
+    curs = conn.cursor()
+    #input_dict = json.loads(Input_JSON)
+
+    if "name" in Input_Dict:
+        Query_string = "UPDATE Personal_Info SET name = '" + Input_Dict["name"] +  "' WHERE user_id = '" + str(Input_User) + "'"
+        curs.execute(Query_string)
+        conn.commit()
+    if "company" in Input_Dict:
+        Query_string = "UPDATE Personal_Info SET company = '" + Input_Dict["company"] +  "' WHERE user_id = '" + str(Input_User) + "'"
+        curs.execute(Query_string)
+        conn.commit()
+    if "email" in Input_Dict:
+        Query_string = "UPDATE Personal_Info SET email = '" + Input_Dict["email"] +  "' WHERE user_id = '" + str(Input_User) + "'"
+        curs.execute(Query_string)
+        conn.commit()
+    if  "phone" in Input_Dict:
+        Query_string = "UPDATE Personal_Info SET phone = '" + Input_Dict["phone"] +  "' WHERE user_id = '" + str(Input_User) + "'"
+        curs.execute(Query_string)
+        conn.commit()
+
 @app.route('/')
 def Placeholder():
     return 'Hello'
@@ -85,7 +108,23 @@ def All_Users():
     All_users_output = All_Users_query()
     return All_users_output
 
-@app.get('/users/<int:user_id>')
+@app.route('/test', methods=['GET', 'POST'])
+@app.route('/users/<int:user_id>', methods=['GET', 'PUT'])
 def Get_Specific_User(user_id):
+    if request.method == 'PUT':
+        Update_json = request.get_json()
+        print (Update_json)
+        Update_User_query(user_id, Update_json)
+
     Specific_user_output = Specific_User_query(user_id)
     return Specific_user_output
+
+@app.route('/test', methods=['GET', 'PUT'])
+def test():
+    if request.method == 'GET':
+        return "get"
+    elif request.method == 'PUT':
+        print ("before processing")
+        data = request.get_json()
+        print(data)
+        return "put"
