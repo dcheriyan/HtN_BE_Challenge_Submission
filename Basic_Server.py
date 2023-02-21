@@ -82,6 +82,7 @@ def Update_User_query(Input_User, Input_Dict):
     curs = conn.cursor()
     #input_dict = json.loads(Input_JSON)
 
+    #Update Personal Info
     if "name" in Input_Dict:
         Query_string = "UPDATE Personal_Info SET name = '" + Input_Dict["name"] +  "' WHERE user_id = '" + str(Input_User) + "'"
         curs.execute(Query_string)
@@ -99,6 +100,62 @@ def Update_User_query(Input_User, Input_Dict):
         curs.execute(Query_string)
         conn.commit()
 
+    #assuming skills inputted as "skills"[ {"skill":"skill_name1", "rating": rating_value1} ] NOT {"skill":"skill_name", "rating": rating_value}
+    if "skills" in Input_Dict:
+        Input_skills_list = Input_Dict["skills"]
+        Current_skills_list = []
+
+        Query_string = "SELECT * FROM User_Skills WHERE user_id = '" + str(Input_User) + "'"
+        res = curs.execute(Query_string)
+        Skill_values = res.fetchall()
+
+        for skill_index in Skill_values:
+            Current_skills_list.append(skill_index[2])
+
+        for skill_index in Input_skills_list:
+            print(skill_index)
+            if skill_index["skill"] in Current_skills_list:
+                #Update Existing Skill
+                Query_string = "UPDATE User_Skills SET rating = " + str(skill_index["rating"]) +  " WHERE user_id = '" + str(Input_User) + "' AND Skill_name = '" + skill_index["skill"] +"'"
+                curs.execute(Query_string)
+                conn.commit()
+            else:
+                #Add new Skill
+                #Get max skill id
+                Query_string = "SELECT MAX(Skill_id) FROM User_Skills"
+                res = curs.execute(Query_string)
+                max_id = res.fetchone()
+
+                Query_string = "INSERT INTO User_Skills VALUES ( " + str(max_id[0] + 1) + ", " + str(Input_User) + ", '" + skill_index["skill"] + "', " + str(skill_index["rating"]) + ")"
+                curs.execute(Query_string)
+                conn.commit()
+
+                #Update Skills Info Table
+                #Check if it exists
+                Query_string = "SELECT * FROM Skills_Info"
+                res = curs.execute(Query_string)
+
+                #Add an '_C' to distinguish variables that take values from Skills Info aka Table C
+                All_skills_dict_C = {}
+                All_skill_values_C = res.fetchall()
+                #Retrieve Current Skills and their frequency
+                for skill_index_all_C in All_skill_values_C:
+                    All_skills_dict_C[skill_index_all_C[1]] = skill_index_all_C[2]
+
+                if skill_index["skill"] in All_skills_dict_C.keys():
+                    #Update Frequency if it Exists
+                    Query_string = "UPDATE Skills_Info SET Frequency = " + str(All_skills_dict_C[skill_index["skill"]] + 1) +  " WHERE Skill_Name = '" + skill_index["skill"] +"'"
+                    curs.execute(Query_string)
+                    conn.commit()
+                else:
+                    Query_string = "SELECT MAX(Skill_Number) FROM Skills_Info"
+                    res = curs.execute(Query_string)
+                    max_id = res.fetchone()
+
+                    Query_string = "INSERT INTO Skills_Info VALUES ( " + str(max_id[0] + 1) + ", '" + skill_index["skill"] + "', 1 )"
+                    curs.execute(Query_string)
+                    conn.commit()
+
 @app.route('/')
 def Placeholder():
     return 'Hello'
@@ -113,7 +170,6 @@ def All_Users():
 def Get_Specific_User(user_id):
     if request.method == 'PUT':
         Update_json = request.get_json()
-        print (Update_json)
         Update_User_query(user_id, Update_json)
 
     Specific_user_output = Specific_User_query(user_id)
