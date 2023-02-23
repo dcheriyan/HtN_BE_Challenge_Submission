@@ -156,6 +156,33 @@ def Update_User_query(Input_User, Input_Dict):
                     curs.execute(Query_string)
                     conn.commit()
 
+def Skills_query(Input_Min, Input_Max):
+    conn = sqlite3.connect("HTN_BE_Challenge.db")
+    #TODO make sure connection was sucessful
+    curs = conn.cursor()
+
+    if Input_Min == None:
+        Input_Min = 0
+
+    if Input_Max == None:
+        Query_string = "SELECT MAX(Skill_Number) FROM Skills_Info"
+        res = curs.execute(Query_string)
+        max_id = res.fetchone()
+        Input_Max = max_id[0]
+
+    Query_string = "SELECT * FROM Skills_Info WHERE Frequency BETWEEN '" + str(Input_Min) + "' AND '" + str(Input_Max) + "'"
+    res = curs.execute(Query_string)
+    Skills_values = res.fetchall()
+    Skills_formatted = []
+    temp_dict = {}
+    for Skill in Skills_values:
+        temp_dict["skill"] = Skill[1]
+        temp_dict["frequency"] = Skill[2]
+        Skills_formatted.append(temp_dict.copy())
+
+    output_json = json.dumps(Skills_formatted)
+    return output_json
+
 @app.route('/')
 def Placeholder():
     return 'Hello'
@@ -175,12 +202,12 @@ def Get_Specific_User(user_id):
     Specific_user_output = Specific_User_query(user_id)
     return Specific_user_output
 
-@app.route('/test', methods=['GET', 'PUT'])
+@app.route('/skills/', methods=['GET', 'PUT'])
 def test():
-    if request.method == 'GET':
-        return "get"
-    elif request.method == 'PUT':
-        print ("before processing")
-        data = request.get_json()
-        print(data)
-        return "put"
+    Max_freq = request.args.get("max_frequency")
+    Min_freq = request.args.get("min_frequency")
+    if Max_freq or Min_freq:
+        Skills_output = Skills_query(Min_freq, Max_freq)
+    else:
+        Skills_output = Skills_query(None, None)
+    return Skills_output
