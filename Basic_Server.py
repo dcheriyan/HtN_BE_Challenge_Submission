@@ -144,7 +144,7 @@ def Update_User_query(Input_User, Input_Dict):
 
                 if skill_index["skill"] in All_skills_dict_C.keys():
                     #Update Frequency if it Exists
-                    Query_string = "UPDATE Skills_Info SET Frequency = " + str(All_skills_dict_C[skill_index["skill"]] + 1) +  " WHERE Skill_Name = '" + skill_index["skill"] +"'"
+                    Query_string = "UPDATE Skills_Info SET frequency = " + str(All_skills_dict_C[skill_index["skill"]] + 1) +  " WHERE skill_name = '" + skill_index["skill"] +"'"
                     curs.execute(Query_string)
                     conn.commit()
                 else:
@@ -187,12 +187,11 @@ def Skills_query(Input_Min, Input_Max):
 def Placeholder():
     return 'Hello'
 
-@app.get('/users')
+@app.get('/users/')
 def All_Users():
     All_users_output = All_Users_query()
     return All_users_output
 
-@app.route('/test', methods=['GET', 'POST'])
 @app.route('/users/<int:user_id>', methods=['GET', 'PUT'])
 def Get_Specific_User(user_id):
     if request.method == 'PUT':
