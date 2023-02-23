@@ -1,4 +1,10 @@
 # HtN_BE_Challenge_Submission
+
+Goals were to create a script to setup and intially load the database based on an input JSON file, then design an API to update and retrieve information from the database.
+
+#### Note about Load Database.py 
+Load_Database.py expects the file "HTN_2023_BE_Challenge_Data.json" in the cwd (where its run from, not necessarily where its located)
+
 ### Language / Tools:
 Using Python since I have used python libraries with json and REST in the past, also memory efficiency and class structure are not neccesities, no technical limitation encouraging use of C/C++
 Will try SQLite for database since it was recommended and easy to install
