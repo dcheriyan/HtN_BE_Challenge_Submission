@@ -19,14 +19,14 @@ if __name__ == '__main__':
 
     #Table A: | User_id	(primary key) | Name | Company | email | phone |
     #Assume Names, Companies, Emails, Phone < 255 char
-    curs.execute("CREATE TABLE Personal_Info( User_id int NOT NULL PRIMARY KEY, Name varchar(255), Company varchar(255), Email varchar(255), Phone varchar(255) )")
+    curs.execute("CREATE TABLE Personal_Info( user_id int NOT NULL PRIMARY KEY, name varchar(255), company varchar(255), email varchar(255), phone varchar(255) )")
 
     #Table B: | Skill_id (primary_key) | User_id | Skill_Name | Rating |
     #Assume Skill_Name < 255 char
-    curs.execute("CREATE TABLE User_Skills(Skill_id int NOT NULL PRIMARY KEY, User_id int, Skill_name varchar(255), Rating int)")
+    curs.execute("CREATE TABLE User_Skills(skill_id int NOT NULL PRIMARY KEY, user_id int, skill_name varchar(255), rating int)")
 
     #Table C: | Skill_Number| Skill_Name	| Frequency |
-    curs.execute("CREATE TABLE Skills_Info(Skill_Number int NOT NULL PRIMARY KEY, Skill_Name varchar(255), Frequency int)")
+    curs.execute("CREATE TABLE Skills_Info(skill_number int NOT NULL PRIMARY KEY, skill_name varchar(255), frequency int)")
 
     User_id = 0
     Skill_id = 0
@@ -74,13 +74,13 @@ if __name__ == '__main__':
     Skill_Number = 0
     Skills_Info_Instruction_Template = "INSERT INTO Skills_Info VALUES ( "
     Skill_Name_Value = "Temp"       # Temp value to define it as a string
-    Frequency_Value = -1            # Temp value to define it as a string
+    Frequency_Value = -1            # Temp value to define it as an int
 
     for Skill in Skills_Dict:
         Skill_Name_Value = Skill
-        Rating_Value = Skills_Dict[Skill]
+        Frequency_Value = Skills_Dict[Skill]
 
-        Instruction_String = Skills_Info_Instruction_Template + str(Skill_Number) + ", '" + Skill_Name_Value + "', " + str(Rating_Value) + ")"
+        Instruction_String = Skills_Info_Instruction_Template + str(Skill_Number) + ", '" + Skill_Name_Value + "', " + str(Frequency_Value) + ")"
         curs.execute(Instruction_String)
         conn.commit()
         Skill_Number += 1
